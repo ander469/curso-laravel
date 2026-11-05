@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Models\Category;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Http\Requests\Post\StoreRequest;
+use App\Http\Requests\Post\PutRequest;
+
 
 class PostController extends Controller
 {
@@ -19,33 +20,9 @@ class PostController extends Controller
         ['slug' => 'general'],
         ['title' => 'General']
     );  
-    //metodo para eliminar un registro
-        //$post = Post::find(7)-> delete();
-
-        //$post = Post::find(1);
-        //$post->update(
-            //[
-                //'title' => 'Mi tets',
-                //'slug' => 'mi-primer-test',
-                //'descripcion' => 'Descripcion de mi primer test',
-                //'content' => 'Contenido de mi primer test',
-                //'image' => 'zapato.jpg',
-                //'posted' => 'not',
-                
-            //]
-        //);
-        /* Post::create(
-            [
-                'title' => 'Mi primer post',
-                'slug' => 'mi-primer-post',
-                'descripcion' => 'Descripcion de mi primer post',
-                'content' => 'Contenido de mi primer post',
-                'image' => 'imagen.jpg',
-                'posted' => 'yes',
-                'category_id' => $category->id,
-            ]
-        );*/
-        return "index";
+        //$posts = Post::get();
+        $posts = Post::paginate(4);
+        return view('dashboard.post.index', compact('posts'));
     }
 
     /**
@@ -53,15 +30,23 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::pluck('title', 'id');
+        $post = new Post();
+        
+        return view('dashboard.post.create', compact('categories', 'post'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        //
+        $category = Category::firstOrCreate(
+        ['slug' => 'general'],
+        ['title' => 'General']
+    ); 
+        Post::create($request->validated());
+            return to_route('post.index');
     }
 
     /**
@@ -69,7 +54,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return view('dashboard.post.show', compact('post'));
     }
 
     /**
@@ -77,15 +62,23 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        $categories = Category::pluck('title', 'id');
+        return view('dashboard.post.edit', compact('post', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Post $post)
+    public function update(StoreRequest $request, Post $post)
     {
-        //
+        $data = $request->validated();
+        //image
+        if(isset($data['image'])){
+            $data['image'] = $filename = time().'.'.$data['image']->extension();
+
+            $request->image->move(public_path('uploads/posts'), $filename);
+        }
+            
+        //image
+        $post->update($data);
+        return to_route('post.index');
     }
 
     /**
@@ -93,6 +86,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return to_route('post.index');
     }
 }
