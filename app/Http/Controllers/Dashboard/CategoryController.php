@@ -42,7 +42,7 @@ class CategoryController extends Controller
         ['title' => 'General']
     ); 
         Category::create($request->validated());
-            return to_route('category.index');
+            return to_route('category.index')->with('status', 'Category created successfully');
     }
 
     /**
@@ -59,7 +59,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $categories = Category::pluck('title', 'id');
-        return view('dashboard.categories.edit', compact('category', 'categories'));
+        return view('dashboard.categories.edit', compact('category', 'categories'))->with('status', 'Category edited successfully');
     }
 
     /**
@@ -69,7 +69,7 @@ class CategoryController extends Controller
     {   
 
         $category->update($request->validated());
-        return to_route('category.index');
+        return to_route('category.index')->with('status', 'Category updated successfully');
     }
 
     /**
@@ -78,6 +78,6 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        return to_route('category.index');
+        return to_route('category.index')->with('status', 'Category deleted successfully');
     }
 }

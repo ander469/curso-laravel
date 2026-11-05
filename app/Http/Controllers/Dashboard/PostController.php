@@ -33,7 +33,7 @@ class PostController extends Controller
         $categories = Category::pluck('title', 'id');
         $post = new Post();
         
-        return view('dashboard.post.create', compact('categories', 'post'));
+        return view('dashboard.post.create', compact('categories', 'post'))->with('status', 'Post created successfully');
     }
 
     /**
@@ -46,7 +46,7 @@ class PostController extends Controller
         ['title' => 'General']
     ); 
         Post::create($request->validated());
-            return to_route('post.index');
+            return to_route('post.index')->with('status', 'Post created successfully');
     }
 
     /**
@@ -63,7 +63,7 @@ class PostController extends Controller
     public function edit(Post $post)
     {
         $categories = Category::pluck('title', 'id');
-        return view('dashboard.post.edit', compact('post', 'categories'));
+        return view('dashboard.post.edit', compact('post', 'categories')) ->with('status', 'Post updated successfully');
     }
 
     public function update(StoreRequest $request, Post $post)
@@ -78,7 +78,7 @@ class PostController extends Controller
             
         //image
         $post->update($data);
-        return to_route('post.index');
+        return to_route('post.index')->with('status', 'Post updated successfully');
     }
 
     /**
@@ -87,6 +87,6 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
-        return to_route('post.index');
+        return to_route('post.index')->with('status', 'Post deleted successfully');
     }
 }
